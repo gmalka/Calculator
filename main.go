@@ -62,11 +62,60 @@ func doItRomeWay(s []byte, delimiter byte) {
 	case '/':
 		result = first / second
 	}
-	if result < 0 {
-		fmt.Println("result of operation with rome numbers cant be negative")
+	if result < 1 {
+		fmt.Println("result of operation with rome numbers cant be negative or null")
 	} else {
-		fmt.Println(result)
+		fmt.Println(resultToRome(result))
 	}
+}
+
+func resultToRome(result int) string {
+	m := []int{1, 5, 10, 50, 100, 500, 1000}
+	c := []byte{'I', 'V', 'X', 'L', 'C', 'D', 'M'}
+	k := make([]int, 0)
+	res := ""
+
+	for result != 0 {
+		k = append(k, result%10)
+		result = result / 10
+	}
+	for n := len(k) - 1; n >= 0; n-- {
+		if k[n] == 0 {
+			continue
+		}
+		num := k[n]
+		for i := 0; i < n; i++ {
+			num *= 10
+		}
+		for j := len(m) - 1; j >= 0; j-- {
+			if num == m[j] {
+				res += string(c[j])
+				break
+			} else if j == 0 {
+				for num >= 0 {
+					res += string(c[j])
+					num -= m[j]
+				}
+				break
+			} else if num > m[j-1] {
+				if j%2 == 0 && (num+m[j-2]) == m[j] {
+					res += string(c[j-2]) + string(c[j])
+				} else if (num + m[j-1]) == m[j] {
+					res += string(c[j-1]) + string(c[j])
+				} else {
+					for num >= m[j-1] {
+						res += string(c[j-1])
+						num -= m[j-1]
+					}
+					if num > 0 {
+						res += resultToRome(num)
+					}
+				}
+				break
+			}
+		}
+	}
+	return res
 }
 
 func romeToArabic(s string) (int, error) {
